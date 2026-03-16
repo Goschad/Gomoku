@@ -1,7 +1,10 @@
 #pragma once
 
+#include "./../core/Cell.hpp"
 #include <SFML/Graphics.hpp>
 #include "./../utils/Define.hpp"
+
+class Board;
 
 struct Layout
 {
@@ -36,6 +39,9 @@ class Renderer
         void drawVerticalLine(sf::RenderWindow& window, const Layout& layout, int col);
         void drawHoshi(sf::RenderWindow& window, const Layout& layout);
 
+        void drawStone(const Layout& layout, int row, int col, Cell cell);
+        void drawGhostStone(const Layout& layout, int row, int col, Cell player);
+
     public:
         Renderer();
         ~Renderer();
@@ -48,7 +54,10 @@ class Renderer
         unsigned int getHeight() const;
 
         void calculateLayout(int board_size);
+        void drawStones(const Board& board, const Layout& layout);
+        void stonePreveiw(Board &board, Cell player);
         void drawGoban(sf::RenderWindow& window, const Layout& layout, const int board_size);
+        bool mouseToBoard(const Layout& layout, const sf::Vector2i& mousePos, int& row, int& col, int boardSize);
 };
 
 

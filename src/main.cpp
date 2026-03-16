@@ -1,11 +1,12 @@
+#include "./../include/core/Game.hpp"
 #include "./../include/core/Board.hpp"
 #include "./../include/render/Renderer.hpp"
 
 int main(void)
 {
+    Game game = Game();
     Renderer render = Renderer();
     Board board = Board(19, 19);
-
 
     while (render.getWindow().isOpen())
     {
@@ -14,6 +15,11 @@ int main(void)
             if (event->is<sf::Event::Closed>() || (event->getIf<sf::Event::KeyPressed>() && event->getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::Escape))
             {
                 render.getWindow().close();
+            }
+            else if ((event->getIf<sf::Event::KeyPressed>() && event->getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::R))
+            {
+                game.resetGame();
+                board.resetBoard();
             }
             else if (const auto* resized = event->getIf<sf::Event::Resized>())
             {
@@ -31,7 +37,8 @@ int main(void)
 
                     if (board.getBoardPositionFromMouse(render.getLayout(), mousePressed->position.x, mousePressed->position.y))
                     {
-                        board.setCell(board.getRow(), board.getCol(), Cell::White);
+                        board.setCell(board.getRow(), board.getCol(), game.getCurrentPlayer());
+                        game.switchPlayer();
                         board.printGrid();
                     }
                 }
@@ -42,6 +49,8 @@ int main(void)
 
         render.getWindow().clear(sf::Color(210, 180, 140));
         render.drawGoban(render.getWindow(), render.getLayout(), board.getRows());
+        render.drawStones(board, render.getLayout());
+        render.stonePreveiw(board, game.getCurrentPlayer());
         render.getWindow().display();
     }
 }

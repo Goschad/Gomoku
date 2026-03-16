@@ -6,7 +6,8 @@ CXXFLAGS = -Wall -Wextra -Werror -std=c++17
 SRCDIR = src
 SRC = $(SRCDIR)/main.cpp \
 	  $(SRCDIR)/render/Renderer.cpp \
-	  $(SRCDIR)/core/Board.cpp
+	  $(SRCDIR)/core/Board.cpp \
+	  $(SRCDIR)/core/Game.cpp
 
 OBJ = $(SRC:.cpp=.o)
 

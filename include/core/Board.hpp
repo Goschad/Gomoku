@@ -1,14 +1,8 @@
 #pragma once
 
 #include <vector>
+#include "./Cell.hpp"
 #include "./../../include/render/Renderer.hpp"
-
-enum class Cell
-{
-    Empty = 0,
-    Black = 1,
-    White = 2
-};
 
 class Board
 {
@@ -35,6 +29,7 @@ class Board
 
         std::vector<std::vector<Cell>> getGrid() const;
 
+        void resetBoard();
         bool isInsideBoard(int row, int col);
         bool getBoardPositionFromMouse(const Layout& layout, int mouseX, int mouseY);
 

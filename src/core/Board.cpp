@@ -62,6 +62,18 @@ int Board::getCols() const
     return (this->_cols);
 }
 
+void Board::resetBoard()
+{
+    for (int i = 0; i < getRows(); i++)
+    {
+        for (int j = 0; j < getRows(); j++)
+        {
+            setCell(i, j, Cell::Empty);
+        }
+    }
+    std::cout << "Reset Board" << std::endl;
+}
+
 bool Board::isInsideBoard(int row, int col)
 {
     return row >= 0 && row < this->_rows && col >= 0 && col < this->_cols;
