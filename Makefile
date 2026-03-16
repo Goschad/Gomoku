@@ -4,9 +4,13 @@ CXX = c++
 CXXFLAGS = -Wall -Wextra -Werror -std=c++17
 
 SRCDIR = src
-SRC = $(SRCDIR)/main.cpp
+SRC = $(SRCDIR)/main.cpp \
+	  $(SRCDIR)/render/Renderer.cpp \
+	  $(SRCDIR)/core/Board.cpp
+
 OBJ = $(SRC:.cpp=.o)
 
+INCLUDE_DIR = include
 SFML_DIR = SFML
 SFML_BUILD = $(SFML_DIR)/build
 SFML_INSTALL = $(CURDIR)/sfml-install
@@ -48,4 +52,4 @@ distclean: fclean
 
 re: distclean all
 
-.PHONY: all clean fclean distclean re sfml
+.PHONY: all clean fclean distclean re
