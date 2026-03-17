@@ -1,6 +1,6 @@
-#include "./../../include/render/Renderer.hpp"
 #include "./../../include/core/Board.hpp"
-#
+#include "./../../include/core/Game.hpp"
+#include "./../../include/render/Renderer.hpp"
 
 // ----------------------------- //
 // Constructor / Destructor
@@ -8,13 +8,15 @@
 
 Renderer::Renderer()
 {
+    ;
     this->_fps = FPS_LIMIT;
     this->_width = WIDTH;
     this->_height = HEIGHT;
     this->_title = WINDOW_TITLE;
     this->_window.create(sf::VideoMode({this->_width, this->_height}), this->_title, sf::Style::Default);
-
-    setFont();
+    this->_font = setFont();
+    this->_modeText = "Player VS Player";
+    
     setIcon();
     setFpsLimit();
 
@@ -30,7 +32,7 @@ Renderer::~Renderer()
 // Window init
 // ----------------------------- //
 
-void Renderer::setFont()
+sf::Font Renderer::setFont()
 {
     sf::Font font;
 
@@ -38,6 +40,7 @@ void Renderer::setFont()
     {
         exit(1);
     }
+    return (font);
 }
 
 void Renderer::setIcon()
@@ -91,9 +94,19 @@ sf::RenderWindow& Renderer::getWindow()
     return (this->_window);
 }
 
+sf::Font& Renderer::getFont()
+{
+    return (this->_font);
+}
+
 const Layout& Renderer::getLayout() const
 {
     return _layout;
+}
+
+const std::string& Renderer::getModeText() const
+{
+    return (this->_modeText);
 }
 
 const std::string& Renderer::getTitle() const
@@ -114,6 +127,15 @@ unsigned int Renderer::getWidth() const
 unsigned int Renderer::getHeight() const
 {
     return (this->_height);
+}
+
+// ----------------------------- //
+// Set
+// ----------------------------- //
+
+void Renderer::setModeText(std::string modeText)
+{
+    this->_modeText = modeText;
 }
 
 // ----------------------------- //
@@ -194,7 +216,7 @@ void Renderer::drawGoban(sf::RenderWindow& window, const Layout& layout, const i
 }
 
 // ----------------------------- //
-// Create Stones
+// Draw Stones
 // ----------------------------- //
 
 void Renderer::drawStone(const Layout& layout, int row, int col, Cell cell)
@@ -303,9 +325,76 @@ void Renderer::stonePreveiw(Board &board, Cell player)
     int row;
     int col;
 
-        if (mouseToBoard(getLayout(), mouse, row, col, board.getRows()))
-        {
-            if (board.getCell(row, col) == Cell::Empty)
-                drawGhostStone(getLayout(), row, col, player);
-        }
+    if (mouseToBoard(getLayout(), mouse, row, col, board.getRows()))
+    {
+        if (board.getCell(row, col) == Cell::Empty)
+            drawGhostStone(getLayout(), row, col, player);
+    }
 }
+
+// ----------------------------- //
+// Draw info
+// ----------------------------- //
+
+static std::string cellToString(Cell cell)
+{
+    switch (cell)
+    {
+        case Cell::Empty: 
+            return "0";
+        case Cell::Black:
+            return "Black";
+        case Cell::White:
+            return "White";
+        default:
+            return "None";
+    }
+}
+
+sf::Text Renderer::makeText(const sf::Font& font, const std::string& str, unsigned int size, float x, float y)
+{
+    sf::Text text(font, str, size);
+    text.setFillColor(sf::Color::Black);
+    text.setPosition(sf::Vector2f(x, y));
+
+    return text;
+}
+
+void Renderer::drawInfos(sf::RenderWindow& window, const Layout& layout, const Game& game)
+{
+    sf::Font font = getFont();
+    
+    float y = layout.panelY + 20.f;
+    const float x = layout.panelX + 20.f;
+
+    sf::Text mode = makeText(font, "Mode : " + getModeText(), 22, x, y);
+    window.draw(mode);
+
+    y += 50;
+    std::string player =  cellToString(game.getCurrentPlayer());
+    sf::Text currentPlayer = makeText(font, "Current Player : " + player, 22, x, y);
+    window.draw(currentPlayer);
+
+    y += 50;
+    std::string turnCount = std::to_string(game.getTurn());
+    sf::Text turn = makeText(font, "Number of turns : " + turnCount, 22, x, y);
+    window.draw(turn);
+
+    y += 50;
+    sf::Text cb = makeText(font, "Black captures : " + std::to_string(game.getCaptureBlack()), 22, x, y);
+    window.draw(cb);
+
+    y += 35;
+    sf::Text cw = makeText(font, "White captures : " +  std::to_string(game.getCaptureWhite()), 22, x, y);
+    window.draw(cw);
+
+    (void)game;
+}
+
+// ----------------------------- //
+// TODO
+//
+// ESC = quit
+// R = restart
+// S = mode switch
+// ----------------------------- //

@@ -5,8 +5,8 @@
 int main(void)
 {
     Game game = Game();
-    Renderer render = Renderer();
     Board board = Board(19, 19);
+    Renderer render = Renderer();
 
     while (render.getWindow().isOpen())
     {
@@ -37,9 +37,15 @@ int main(void)
 
                     if (board.getBoardPositionFromMouse(render.getLayout(), mousePressed->position.x, mousePressed->position.y))
                     {
-                        board.setCell(board.getRow(), board.getCol(), game.getCurrentPlayer());
-                        game.switchPlayer();
-                        board.printGrid();
+                        if (board.getCell(board.getRow(), board.getCol()) == Cell::Empty)
+                        {
+                            
+                            game.playMove(board);
+                            board.printGrid();
+                            /*board.setCell(board.getRow(), board.getCol(), game.getCurrentPlayer());
+                            game.switchPlayer();
+                            game.setTurn(game.getTurn() + 1);*/
+                        }
                     }
                 }
             }
@@ -51,6 +57,7 @@ int main(void)
         render.drawGoban(render.getWindow(), render.getLayout(), board.getRows());
         render.drawStones(board, render.getLayout());
         render.stonePreveiw(board, game.getCurrentPlayer());
+        render.drawInfos(render.getWindow(), render.getLayout(), game);
         render.getWindow().display();
     }
 }
