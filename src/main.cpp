@@ -41,7 +41,7 @@ int main(void)
                         {
                             
                             game.playMove(board);
-                            board.printGrid();
+                            //board.printGrid();
                             /*board.setCell(board.getRow(), board.getCol(), game.getCurrentPlayer());
                             game.switchPlayer();
                             game.setTurn(game.getTurn() + 1);*/

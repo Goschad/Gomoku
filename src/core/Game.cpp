@@ -7,7 +7,7 @@ Game::Game()
     this->_capture_black = 0;
     this->_capture_white = 0;
     this->_currentPlayer = Cell::Black;
-    this->_pending_winner = false;
+    this->_pending_winner = Cell::Empty;
     this->_winner = Cell::Empty;
     std::cout << "Game constructor called..." << std::endl;
 }
@@ -41,6 +41,11 @@ void Game::setCurrentPlayer(Cell player)
     this->_currentPlayer = player;
 }
 
+void Game::setWinner(Cell player)
+{
+    this->_winner = player;
+}
+
 // ----------------------------- //
 // Get
 // ----------------------------- //
@@ -60,10 +65,38 @@ int Game::getCaptureWhite() const
     return (this->_capture_white);
 }
 
+int Game::getCurrentPlayerCapture() const
+{
+    if (getCurrentPlayer() == Cell::White)
+        return (this->_capture_white);
+    else
+        return (this->_capture_black);
+}
+
+
 Cell Game::getCurrentPlayer() const
 {
     return (this->_currentPlayer);
 }
+
+Cell Game::getWinner() const
+{
+    return (this->_winner);
+}
+
+Cell Game::getPendingWinner() const
+{
+    return (this->_winner);
+}
+
+Cell Game::getOpponent() const
+{
+    if (getCurrentPlayer() == Cell::Black)
+        return (Cell::White);
+    else
+        return (Cell::Black);
+}
+
 
 // ----------------------------- //
 // Event
@@ -86,7 +119,7 @@ void Game::switchPlayer()
 }
 
 // ----------------------------- //
-// Game logic
+// Capture
 // ----------------------------- //
 
 void Game::addCapturePoints()
@@ -97,15 +130,7 @@ void Game::addCapturePoints()
         setCaptureWhite(getCaptureWhite() + 2);
 }
 
-Cell Game::getOpponent() const
-{
-    if (getCurrentPlayer() == Cell::Black)
-        return (Cell::White);
-    else
-        return (Cell::Black);
-}
-
-bool Game::checkCapture(Board &board, int r, int c)
+bool Game::checkCapture(Board &board, int r, int c, bool pending_test)
 {
     int dx[8] = {1, -1, 0, 0, 1, -1, 1, -1};
     int dy[8] = {0, 0, 1, -1, 1, -1, -1, 1};
@@ -127,13 +152,59 @@ bool Game::checkCapture(Board &board, int r, int c)
         {
             if (board.getCell(x1, y1) == opponent && board.getCell(x2, y2) == opponent && board.getCell(x3, y3) == getCurrentPlayer())
             {
-                board.setCell(x1, y1, Cell::Empty);
-                board.setCell(x2, y2, Cell::Empty);
-                addCapturePoints();
+                if (pending_test)
+                {
+                    board.setCell(x1, y1, Cell::Empty);
+                    board.setCell(x2, y2, Cell::Empty);
+                    addCapturePoints();
+                }
+                return (true);
             }
         }
     }
-    return (true);
+    return (false);
+}
+
+// ----------------------------- //
+// Five
+// ----------------------------- //
+
+int Game::countDirection(Board &board, int x, int y, int dx, int dy) {
+    int count = 0;
+    int nx = x + dx;
+    int ny = y + dy;
+
+    while (board.isInsideBoard(nx, ny) && board.getCell(nx, ny) == getCurrentPlayer())
+    {
+        count++;
+        nx += dx;
+        ny += dy;
+    }
+
+    return count;
+}
+
+bool Game::hasFiveOrMore(Board &board, int x, int y)
+{
+    int directions[4][2] = {{1, 0}, {0, 1}, {1, 1}, {1, -1}};
+
+    for (int i = 0; i < 4; i++)
+    {
+        int dx = directions[i][0];
+        int dy = directions[i][1];
+
+        int count = 1;
+
+        count += countDirection(board, x, y, dx, dy);
+        count += countDirection(board, x, y, -dx, -dy);
+
+        if (count >= 5)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 // ----------------------------- //
@@ -150,11 +221,21 @@ void Game::playMove(Board &board)
     // check double three
 
     // capture 
-    checkCapture(board, r, c);
-    
-    // victory by capture (10)
+    if (checkCapture(board, r, c, false))
+    {
+        if (getCurrentPlayerCapture() == 10)
+        {
+            setWinner(getCurrentPlayer());
+            std::cout << "winner" << std::endl;
+        }
+    }
 
-    // check 5
+    if (hasFiveOrMore(board, r, c))
+    {
+        setWinner(getCurrentPlayer());
+        std::cout << "winner" << std::endl;
+    } // add pending issue
+
 
     // + pending if capture is possible
     setTurn(getTurn() + 1);

@@ -13,10 +13,11 @@ class Game
         int _capture_black;
         int _capture_white;
         Cell _winner;
-        bool _pending_winner;
+        Cell _pending_winner;
 
         Cell getOpponent() const;
         void addCapturePoints();
+        int countDirection(Board &board, int x, int y, int dx, int dy);
 
     public:
         Game();
@@ -29,13 +30,18 @@ class Game
         void setCaptureBlack(int value);
         void setCaptureWhite(int value);
         void setCurrentPlayer(Cell player);
+        void setWinner(Cell player);
 
         int getTurn() const;
         int getCaptureBlack() const;
         int getCaptureWhite() const;
+        int getCurrentPlayerCapture() const;
+        Cell getWinner() const;
+        Cell getPendingWinner() const;
         Cell getCurrentPlayer() const;
 
-        bool checkCapture(Board &board, int r, int c);
+        bool checkCapture(Board &board, int r, int c, bool pending_test);
+        bool hasFiveOrMore(Board &board, int x, int y);
 
         void playMove(Board &board);
 };

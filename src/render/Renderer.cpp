@@ -388,7 +388,10 @@ void Renderer::drawInfos(sf::RenderWindow& window, const Layout& layout, const G
     sf::Text cw = makeText(font, "White captures : " +  std::to_string(game.getCaptureWhite()), 22, x, y);
     window.draw(cw);
 
-    (void)game;
+    /*if (game.getWinner())
+    {
+        
+    }*/
 }
 
 // ----------------------------- //
