@@ -360,6 +360,32 @@ sf::Text Renderer::makeText(const sf::Font& font, const std::string& str, unsign
     return text;
 }
 
+void Renderer::drawVictory(sf::RenderWindow& window, const Game& game, sf::Font font)
+{
+    sf::RectangleShape overlay(sf::Vector2f(window.getSize().x, window.getSize().y));
+    overlay.setFillColor(sf::Color(0, 0, 0, 160));
+    window.draw(overlay);
+    
+    std::string winnerStr = cellToString(game.getWinner());
+
+    sf::Text winnerText = makeText(font, "The winner is " + winnerStr + " !", 64, window.getSize().x / 2.f, window.getSize().y / 2.f - 50.f);
+    winnerText.setOrigin(sf::Vector2f(
+        winnerText.getLocalBounds().size.x / 2.f,
+        winnerText.getLocalBounds().size.y / 2.f
+    ));
+    winnerText.setFillColor(sf::Color::White);
+    window.draw(winnerText);
+
+    sf::Text restartText = makeText(font, "Press R to restart", 28,
+        window.getSize().x / 2.f, window.getSize().y / 2.f + 30.f);
+    restartText.setOrigin(sf::Vector2f(
+        restartText.getLocalBounds().size.x / 2.f,
+        restartText.getLocalBounds().size.y / 2.f
+    ));
+    restartText.setFillColor(sf::Color(200, 200, 200));
+    window.draw(restartText);
+}
+
 void Renderer::drawInfos(sf::RenderWindow& window, const Layout& layout, const Game& game)
 {
     sf::Font font = getFont();
@@ -388,10 +414,8 @@ void Renderer::drawInfos(sf::RenderWindow& window, const Layout& layout, const G
     sf::Text cw = makeText(font, "White captures : " +  std::to_string(game.getCaptureWhite()), 22, x, y);
     window.draw(cw);
 
-    /*if (game.getWinner())
-    {
-        
-    }*/
+    if (game.getWinner() != Cell::Empty)
+        drawVictory(window, game, font);
 }
 
 // ----------------------------- //

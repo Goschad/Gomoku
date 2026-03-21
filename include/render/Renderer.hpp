@@ -46,6 +46,7 @@ class Renderer
         void drawGhostStone(const Layout& layout, int row, int col, Cell player);
 
         sf::Text makeText(const sf::Font& font, const std::string& str, unsigned int size, float x, float y);
+        void drawVictory(sf::RenderWindow& window, const Game& game, sf::Font font);
 
     public:
         Renderer();
