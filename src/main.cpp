@@ -49,7 +49,7 @@ int main(void)
         render.getWindow().clear(sf::Color(210, 180, 140));
         render.drawGoban(render.getWindow(), render.getLayout(), board.getRows());
         render.drawStones(board, render.getLayout());
-        if (game.getWinner() == Cell::Empty) render.stonePreveiw(board, game.getCurrentPlayer());
+        if (game.getWinner() == Cell::Empty) render.stonePreveiw(board, game, game.getCurrentPlayer());
         render.drawInfos(render.getWindow(), render.getLayout(), game);
         render.getWindow().display();
     }

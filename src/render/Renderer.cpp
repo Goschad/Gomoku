@@ -15,6 +15,9 @@ Renderer::Renderer()
     this->_title = WINDOW_TITLE;
     this->_window.create(sf::VideoMode({this->_width, this->_height}), this->_title, sf::Style::Default);
     this->_font = setFont();
+    this->_lastHoverRow = -1;
+    this->_lastHoverCol = -1;
+    this->_lastIsDoubleThree = false;
     this->_modeText = "Player VS Player";
     
     setIcon();
@@ -298,10 +301,16 @@ bool Renderer::mouseToBoard(const Layout& layout, const sf::Vector2i& mousePos, 
     return true;
 }
 
-void Renderer::drawGhostStone(const Layout& layout, int row, int col, Cell player)
+void Renderer::drawGhostStone(Game& game, Board &board, const Layout& layout, int row, int col, Cell player)
 {
-    const float stoneRadius = layout.cellSize * 0.40f;
+    if (row != _lastHoverRow || col != _lastHoverCol)
+    {
+        _lastHoverRow = row;
+        _lastHoverCol = col;
+        _lastIsDoubleThree = game.isDoubleThree(board, row, col);
+    }
 
+    const float stoneRadius = layout.cellSize * 0.40f;
     const float x = layout.boardOffsetX + col * layout.cellSize;
     const float y = layout.boardOffsetY + row * layout.cellSize;
 
@@ -310,7 +319,9 @@ void Renderer::drawGhostStone(const Layout& layout, int row, int col, Cell playe
     ghost.setOrigin(sf::Vector2f(stoneRadius, stoneRadius));
     ghost.setPosition(sf::Vector2f(x, y));
 
-    if (player == Cell::Black)
+    if (_lastIsDoubleThree)
+        ghost.setFillColor(sf::Color(200, 20, 20, 120));
+    else if (player == Cell::Black)
         ghost.setFillColor(sf::Color(20, 20, 20, 120));
     else
         ghost.setFillColor(sf::Color(240, 240, 235, 160));
@@ -318,7 +329,7 @@ void Renderer::drawGhostStone(const Layout& layout, int row, int col, Cell playe
     _window.draw(ghost);
 }
 
-void Renderer::stonePreveiw(Board &board, Cell player)
+void Renderer::stonePreveiw(Board &board, Game& game, Cell player)
 {
     sf::Vector2i mouse = sf::Mouse::getPosition(getWindow());
 
@@ -328,7 +339,7 @@ void Renderer::stonePreveiw(Board &board, Cell player)
     if (mouseToBoard(getLayout(), mouse, row, col, board.getRows()))
     {
         if (board.getCell(row, col) == Cell::Empty)
-            drawGhostStone(getLayout(), row, col, player);
+            drawGhostStone(game, board, getLayout(), row, col, player);
     }
 }
 

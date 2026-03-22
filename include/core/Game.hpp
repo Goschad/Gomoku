@@ -53,5 +53,9 @@ class Game
 
         bool isWinningLineBreakable(Board &board, const std::vector<std::pair<int,int>> &line);
 
+        bool isOpenThree(Board &board, int x, int y, int dx, int dy);
+        int countOpenThrees(Board &board, int x, int y);
+        bool isDoubleThree(Board &board, int x, int y);
+
         void playMove(Board &board);
 };

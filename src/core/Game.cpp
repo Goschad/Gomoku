@@ -344,6 +344,74 @@ bool Game::isWinningLineBreakable(Board &board, const std::vector<std::pair<int,
 }
 
 // ----------------------------- //
+// Double three
+// ----------------------------- //
+
+bool Game::isOpenThree(Board &board, int x, int y, int dx, int dy)
+{
+    int minStep = 0;
+    int maxStep = 0;
+    Cell player = getCurrentPlayer();
+
+    std::vector<std::pair<int,int>> line;
+    line.push_back({x, y});
+
+    for (int step = 1; step <= 4; step++)
+    {
+        int nx = x + dx * step, ny = y + dy * step;
+        if (!board.isInsideBoard(nx, ny) || board.getCell(nx, ny) != player) break;
+        line.push_back({nx, ny});
+    }
+    for (int step = 1; step <= 4; step++)
+    {
+        int nx = x - dx * step, ny = y - dy * step;
+        if (!board.isInsideBoard(nx, ny) || board.getCell(nx, ny) != player) break;
+        line.push_back({nx, ny});
+    }
+
+    if ((int)line.size() != 3) return false;
+
+    for (auto &p : line)
+    {
+        int step = (p.first - x) / (dx != 0 ? dx : 1) +
+                   (p.second - y) / (dy != 0 ? dy : 1);
+        minStep = std::min(minStep, step);
+        maxStep = std::max(maxStep, step);
+    }
+
+    int beforeX = x + dx * (minStep - 1), beforeY = y + dy * (minStep - 1);
+    int afterX  = x + dx * (maxStep + 1), afterY  = y + dy * (maxStep + 1);
+
+    bool beforeOpen = board.isInsideBoard(beforeX, beforeY) &&
+                      board.getCell(beforeX, beforeY) == Cell::Empty;
+    bool afterOpen  = board.isInsideBoard(afterX, afterY) &&
+                      board.getCell(afterX, afterY) == Cell::Empty;
+
+    return beforeOpen && afterOpen;
+}
+
+int Game::countOpenThrees(Board &board, int x, int y)
+{
+    int directions[4][2] = {{1, 0}, {0, 1}, {1, 1}, {1, -1}};
+    int count = 0;
+
+    board.setCell(x, y, getCurrentPlayer());
+
+    for (int i = 0; i < 4; i++)
+        if (isOpenThree(board, x, y, directions[i][0], directions[i][1]))
+            count++;
+
+    board.setCell(x, y, Cell::Empty);
+
+    return count;
+}
+
+bool Game::isDoubleThree(Board &board, int x, int y)
+{
+    return countOpenThrees(board, x, y) >= 2;
+}
+
+// ----------------------------- //
 // Play Move
 // ----------------------------- //
 
@@ -352,8 +420,6 @@ void Game::playMove(Board &board)
     int r = board.getRow();
     int c = board.getCol();
     Cell played = getCurrentPlayer();
-
-    board.setCell(r, c, played);
 
     // check double three
 
@@ -364,6 +430,15 @@ void Game::playMove(Board &board)
             setWinner(getCurrentPlayer());
         }
     }
+
+    if (isDoubleThree(board, r, c))
+    {
+        // Ne pas jouer, signaler l'erreur
+        std::cout << "Double-three interdit !" << std::endl;
+        return;
+    }
+
+    board.setCell(r, c, played);
 
     if (_pendingWinner != Cell::Empty && _pendingWinner != getCurrentPlayer())
     {

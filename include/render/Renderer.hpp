@@ -31,6 +31,9 @@ class Renderer
         unsigned int _width;
         unsigned int _height;
         std::string _modeText;
+        int _lastHoverRow;
+        int _lastHoverCol;
+        bool _lastIsDoubleThree;
         sf::RenderWindow _window;
 
         void setIcon();
@@ -43,7 +46,7 @@ class Renderer
         void drawHoshi(sf::RenderWindow& window, const Layout& layout);
 
         void drawStone(const Layout& layout, int row, int col, Cell cell);
-        void drawGhostStone(const Layout& layout, int row, int col, Cell player);
+        void drawGhostStone(Game& game, Board &board, const Layout& layout, int row, int col, Cell player);
 
         sf::Text makeText(const sf::Font& font, const std::string& str, unsigned int size, float x, float y);
         void drawVictory(sf::RenderWindow& window, const Game& game, sf::Font font);
@@ -64,7 +67,7 @@ class Renderer
         void setModeText(std::string modeText);
 
         void calculateLayout(int board_size);
-        void stonePreveiw(Board &board, Cell player);
+        void stonePreveiw(Board &board, Game& game, Cell player);
         void drawStones(const Board& board, const Layout& layout);
         void drawInfos(sf::RenderWindow& window, const Layout& layout, const Game& game);
         void drawGoban(sf::RenderWindow& window, const Layout& layout, const int board_size);
