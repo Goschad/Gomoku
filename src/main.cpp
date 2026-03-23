@@ -21,12 +21,12 @@ int main(void)
                 game.resetGame();
                 board.resetBoard();
             }
-            else if (const auto* resized = event->getIf<sf::Event::Resized>())
+            else if (const sf::Event::Resized *resized = event->getIf<sf::Event::Resized>())
             {
                 sf::FloatRect visibleArea(sf::Vector2f(0.f, 0.f), sf::Vector2f(static_cast<float>(resized->size.x), static_cast<float>(resized->size.y)));
                 render.getWindow().setView(sf::View(visibleArea));
             }
-            else if (const auto* mousePressed = event->getIf<sf::Event::MouseButtonPressed>())
+            else if (const sf::Event::MouseButtonPressed *mousePressed = event->getIf<sf::Event::MouseButtonPressed>())
             {
                 if (mousePressed->button == sf::Mouse::Button::Left)
                 {

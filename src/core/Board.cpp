@@ -74,6 +74,19 @@ void Board::resetBoard()
     std::cout << "Reset Board" << std::endl;
 }
 
+bool Board::isBoardFull()
+{
+    for (int r = 0; r < _rows; r++)
+    {
+        for (int c = 0; c < _cols; c++)
+        {
+            if (_grid[r][c] == Cell::Empty)
+                return (false);
+        }
+    }
+    return (true);
+}
+
 bool Board::isInsideBoard(int row, int col)
 {
     return row >= 0 && row < this->_rows && col >= 0 && col < this->_cols;

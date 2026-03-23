@@ -196,7 +196,7 @@ void Game::clearPendingWinner()
 bool Game::lineStillExists(Board &board) const
 {
     if (_pendingLine.empty()) return false;
-    for (auto &p : _pendingLine)
+    for (const std::__1::pair<int, int> &p : _pendingLine)
     {
         if (!board.isInsideBoard(p.first, p.second))
             return false;
@@ -317,7 +317,7 @@ bool Game::isWinningLineBreakable(Board &board, const std::vector<std::pair<int,
     // Calcul de la bounding box de la ligne + marge de 3
     int minX = line[0].first, maxX = line[0].first;
     int minY = line[0].second, maxY = line[0].second;
-    for (auto &p : line)
+    for (const std::__1::pair<int, int> &p : line)
     {
         minX = std::min(minX, p.first);
         maxX = std::max(maxX, p.first);
@@ -345,7 +345,7 @@ bool Game::isWinningLineBreakable(Board &board, const std::vector<std::pair<int,
                 continue;
 
             // Si une cellule capturée appartient à la ligne → la ligne est cassable
-            for (auto &cap : caps)
+            for (const std::__1::pair<int, int> &cap : caps)
             {
                 if (lineSet.count(cap))
                     return true;
@@ -383,7 +383,7 @@ bool Game::isOpenThree(Board &board, int x, int y, int dx, int dy)
 
     if ((int)line.size() != 3) return false;
 
-    for (auto &p : line)
+    for (const std::__1::pair<int, int> &p : line)
     {
         int step = (p.first - x) / (dx != 0 ? dx : 1) +
                    (p.second - y) / (dy != 0 ? dy : 1);
@@ -435,8 +435,6 @@ void Game::playMove(Board &board)
     int c = board.getCol();
     Cell played = getCurrentPlayer();
 
-    // check double three
-
     if (isDoubleThree(board, r, c))
     {
         std::cout << "Double-three interdit !" << std::endl;
@@ -480,6 +478,14 @@ void Game::playMove(Board &board)
                     setWinner(getCellToWinner(getCurrentPlayer()));
                 }
             }
+        }
+    }
+
+    if (getWinner() == Winner::None)
+    {
+        if (board.isBoardFull())
+        {
+            setWinner(Winner::Draw);
         }
     }
 

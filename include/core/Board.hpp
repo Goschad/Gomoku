@@ -28,6 +28,7 @@ class Board
         void setCell(int r, int c, Cell value);
 
         std::vector<std::vector<Cell>> getGrid() const;
+        bool isBoardFull();
 
         void resetBoard();
         bool isInsideBoard(int row, int col);
