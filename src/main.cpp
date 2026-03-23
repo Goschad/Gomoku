@@ -37,7 +37,7 @@ int main(void)
 
                     if (board.getBoardPositionFromMouse(render.getLayout(), mousePressed->position.x, mousePressed->position.y))
                     {
-                        if (board.getCell(board.getRow(), board.getCol()) == Cell::Empty && game.getWinner() == Cell::Empty)
+                        if (board.getCell(board.getRow(), board.getCol()) == Cell::Empty && game.getWinner() == Winner::None)
                             game.playMove(board);
                     }
                 }
@@ -49,7 +49,8 @@ int main(void)
         render.getWindow().clear(sf::Color(210, 180, 140));
         render.drawGoban(render.getWindow(), render.getLayout(), board.getRows());
         render.drawStones(board, render.getLayout());
-        if (game.getWinner() == Cell::Empty) render.stonePreveiw(board, game, game.getCurrentPlayer());
+        if (game.getWinner() == Winner::None) 
+            render.stonePreveiw(board, game, game.getCurrentPlayer());
         render.drawInfos(render.getWindow(), render.getLayout(), game);
         render.getWindow().display();
     }

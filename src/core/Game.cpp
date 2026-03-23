@@ -8,7 +8,7 @@ Game::Game()
     this->_captureWhite = 0;
     this->_currentPlayer = Cell::Black;
     this->_pendingWinner = Cell::Empty;
-    this->_winner = Cell::Empty;
+    this->_winner = Winner::None;
     this->_pendingLine = {};
     std::cout << "Game constructor called..." << std::endl;
 }
@@ -42,9 +42,9 @@ void Game::setCurrentPlayer(Cell player)
     this->_currentPlayer = player;
 }
 
-void Game::setWinner(Cell player)
+void Game::setWinner(Winner winner)
 {
-    this->_winner = player;
+    this->_winner = winner;
 }
 
 void Game::setPendingWinner(Cell player, const std::vector<std::pair<int,int>> &line)
@@ -80,20 +80,29 @@ int Game::getCurrentPlayerCapture() const
         return (this->_captureBlack);
 }
 
+Winner Game::getCellToWinner(Cell player) const
+{
+    if (player == Cell::Black)
+        return (Winner::Black);
+    else if (player == Cell::White)
+        return (Winner::White);
+    else
+        return (Winner::None);
+}
 
 Cell Game::getCurrentPlayer() const
 {
     return (this->_currentPlayer);
 }
 
-Cell Game::getWinner() const
+Winner Game::getWinner() const
 {
     return (this->_winner);
 }
 
 Cell Game::getPendingWinner() const
 {
-    return (this->_winner);
+    return (this->_pendingWinner);
 }
 
 Cell Game::getOpponent() const
@@ -115,7 +124,7 @@ void Game::resetGame()
     setCaptureBlack(0);
     setCaptureWhite(0);
     setCurrentPlayer(Cell::Black);
-    setWinner(Cell::Empty);
+    setWinner(Winner::None);
     setPendingWinner(Cell::Empty, {});
 }
 
@@ -139,7 +148,7 @@ void Game::addCapturePoints()
         setCaptureWhite(getCaptureWhite() + 2);
 }
 
-bool Game::checkCapture(Board &board, int r, int c)
+bool Game::checkCapture(Board &board, int r, int c, bool capture)
 {
     int dx[8] = {1, -1, 0, 0, 1, -1, 1, -1};
     int dy[8] = {0, 0, 1, -1, 1, -1, -1, 1};
@@ -161,9 +170,12 @@ bool Game::checkCapture(Board &board, int r, int c)
         {
             if (board.getCell(x1, y1) == opponent && board.getCell(x2, y2) == opponent && board.getCell(x3, y3) == getCurrentPlayer())
             {
-                board.setCell(x1, y1, Cell::Empty);
-                board.setCell(x2, y2, Cell::Empty);
-                addCapturePoints();
+                if (capture)
+                {
+                    board.setCell(x1, y1, Cell::Empty);
+                    board.setCell(x2, y2, Cell::Empty);
+                    addCapturePoints();
+                }
                 return (true);
             }
         }
@@ -188,7 +200,7 @@ bool Game::lineStillExists(Board &board) const
     {
         if (!board.isInsideBoard(p.first, p.second))
             return false;
-        if (board.getCell(p.first, p.second) != _pendingWinner)
+        if (board.getCell(p.first, p.second) != getPendingWinner())
             return false;
     }
     return true;
@@ -408,6 +420,8 @@ int Game::countOpenThrees(Board &board, int x, int y)
 
 bool Game::isDoubleThree(Board &board, int x, int y)
 {
+    if (checkCapture(board, x, y, false)) 
+        return (false);
     return countOpenThrees(board, x, y) >= 2;
 }
 
@@ -423,19 +437,18 @@ void Game::playMove(Board &board)
 
     // check double three
 
-    if (checkCapture(board, r, c))
+    if (isDoubleThree(board, r, c))
+    {
+        std::cout << "Double-three interdit !" << std::endl;
+        return;
+    }
+    
+    if (checkCapture(board, r, c, true))
     {
         if (getCurrentPlayerCapture() == 10)
         {
-            setWinner(getCurrentPlayer());
+            setWinner(getCellToWinner(getCurrentPlayer()));
         }
-    }
-
-    if (isDoubleThree(board, r, c))
-    {
-        // Ne pas jouer, signaler l'erreur
-        std::cout << "Double-three interdit !" << std::endl;
-        return;
     }
 
     board.setCell(r, c, played);
@@ -444,9 +457,8 @@ void Game::playMove(Board &board)
     {
         if (lineStillExists(board))
         {
-            setWinner(_pendingWinner);
+            setWinner(getCellToWinner(_pendingWinner));
             clearPendingWinner();
-            // win
             return;
         }
         else
@@ -465,8 +477,7 @@ void Game::playMove(Board &board)
                     setPendingWinner(getCurrentPlayer(), line);
                 else
                 {
-                    setWinner(getCurrentPlayer());
-                    // win
+                    setWinner(getCellToWinner(getCurrentPlayer()));
                 }
             }
         }

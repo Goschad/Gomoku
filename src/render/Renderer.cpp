@@ -362,6 +362,21 @@ static std::string cellToString(Cell cell)
     }
 }
 
+static std::string winnerToString(Winner winner)
+{
+    switch (winner)
+    {
+        case Winner::Black:
+            return ("Black");
+        case Winner::White:
+            return ("White");
+        case Winner::Draw:
+            return ("Draw");
+        default:
+            return ("None");
+    }
+}
+
 sf::Text Renderer::makeText(const sf::Font& font, const std::string& str, unsigned int size, float x, float y)
 {
     sf::Text text(font, str, size);
@@ -376,14 +391,28 @@ void Renderer::drawVictory(sf::RenderWindow& window, const Game& game, sf::Font 
     sf::RectangleShape overlay(sf::Vector2f(window.getSize().x, window.getSize().y));
     overlay.setFillColor(sf::Color(0, 0, 0, 160));
     window.draw(overlay);
-    
-    std::string winnerStr = cellToString(game.getWinner());
 
-    sf::Text winnerText = makeText(font, "The winner is " + winnerStr + " !", 64, window.getSize().x / 2.f, window.getSize().y / 2.f - 50.f);
+    std::string winnerStr = winnerToString(game.getWinner());
+
+    std::string text;
+    if (game.getWinner() == Winner::Draw)
+        text = "It's a draw!";
+    else
+        text = "The winner is " + winnerToString(game.getWinner()) + "!";
+
+    sf::Text winnerText = makeText(
+        font,
+        text,
+        64,
+        window.getSize().x / 2.f,
+        window.getSize().y / 2.f - 50.f
+    );
+
     winnerText.setOrigin(sf::Vector2f(
         winnerText.getLocalBounds().size.x / 2.f,
         winnerText.getLocalBounds().size.y / 2.f
     ));
+
     winnerText.setFillColor(sf::Color::White);
     window.draw(winnerText);
 
@@ -425,7 +454,7 @@ void Renderer::drawInfos(sf::RenderWindow& window, const Layout& layout, const G
     sf::Text cw = makeText(font, "White captures : " +  std::to_string(game.getCaptureWhite()), 22, x, y);
     window.draw(cw);
 
-    if (game.getWinner() != Cell::Empty)
+    if (game.getWinner() != Winner::None)
         drawVictory(window, game, font);
 }
 

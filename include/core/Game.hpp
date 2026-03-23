@@ -3,6 +3,7 @@
 #include <set>
 
 #include "./Cell.hpp"
+#include "./Winner.hpp"
 #include "./../utils/Define.hpp"
 
 class Board;
@@ -14,7 +15,7 @@ class Game
         Cell _currentPlayer;
         int _captureBlack;
         int _captureWhite;
-        Cell _winner;
+        Winner _winner;
         Cell _pendingWinner;
         std::vector<std::pair<int,int>> _pendingLine;
 
@@ -37,18 +38,19 @@ class Game
         void setCaptureBlack(int value);
         void setCaptureWhite(int value);
         void setCurrentPlayer(Cell player);
-        void setWinner(Cell player);
+        void setWinner(Winner winner);
         void setPendingWinner(Cell player, const std::vector<std::pair<int,int>> &line);
 
         int getTurn() const;
         int getCaptureBlack() const;
         int getCaptureWhite() const;
         int getCurrentPlayerCapture() const;
-        Cell getWinner() const;
+        Winner getWinner() const;
         Cell getPendingWinner() const;
         Cell getCurrentPlayer() const;
+        Winner getCellToWinner(Cell player) const;
 
-        bool checkCapture(Board &board, int r, int c);
+        bool checkCapture(Board &board, int r, int c, bool capture);
         bool hasFiveOrMore(Board &board, int x, int y);
 
         bool isWinningLineBreakable(Board &board, const std::vector<std::pair<int,int>> &line);
